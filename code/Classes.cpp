@@ -27,6 +27,7 @@ class Column_object : public Data_object {
 
 
 class Diagram {
+    public:
     Data_object* Header;
 
     Diagram() : Header(nullptr) {}
@@ -85,10 +86,25 @@ class Diagram {
         }
     }
 
+    bool Circularity_test(){
+        Data_object* current_node = this->Header->Right;
+        while (current_node != this->Header){
+            Data_object* vertical_node = current_node->Down;
+            while (vertical_node != current_node){
+                vertical_node = vertical_node->Down;
+            }
+        }
+
+        while (current_node != this->Header){
+            Data_object* horizontal_node = current_node->Right;
+            while (horizontal_node != current_node){
+                horizontal_node = horizontal_node->Right;
+            }
+        }
+
+        return true;
+    }
+
 };
 
-int main() {
 
-
-    return 0;
-}
