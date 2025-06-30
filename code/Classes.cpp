@@ -11,11 +11,9 @@ class Data_object {
     Data_object* Down;
     Data_object* Column_header;
 
-    Data_object(L, R, U, D, C) : Left(L), Right(R), Up(U), Down(D), Column_header(C) {}
-
     Data_object() : Left(nullptr), Right(nullptr), Up(nullptr), Down(nullptr), Column_header(nullptr) {}
 
-}
+};
 
 
 class Column_object : public Data_object {
@@ -64,7 +62,7 @@ class Diagram {
 
         // Vertically link nodes
         for (int j = 0; j < matrix[0].size(); j++) {
-            Column_object* column = data_objects[0][j];
+            Data_object* column = data_objects[0][j];
             for (int i = 1; i <= matrix.size(); i++) {
                 data_objects[i][j]->Column_header = column;
                 data_objects[i][j]->Up = data_objects[i-1][j];
@@ -87,4 +85,10 @@ class Diagram {
         }
     }
 
+};
+
+int main() {
+
+
+    return 0;
 }
