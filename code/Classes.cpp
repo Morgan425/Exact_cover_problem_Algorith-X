@@ -62,6 +62,9 @@ class Diagram {
         }
 
         // Fill the first row with Column_object instances and links them
+        if (column_names.size() < matrix[0].size()) {
+            std::cerr << "Warning: Not enough column names provided. Default names will be used for missing columns." << std::endl << std::endl;
+        }
         for (int j = 0; j < matrix[0].size(); j++) {
             std::string column_name;
             if (j < column_names.size()) {
@@ -216,11 +219,6 @@ class Diagram {
         }
     }
 
-    void cover_chosen_column() {
-        Column_object* column = min_size_column();
-        cover_column(column);
-    }
-
 
     void uncover_column(Column_object* column) {
         for (Data_object* i = column->Up; i != column; i = i->Up) {
@@ -234,7 +232,33 @@ class Diagram {
         column->Right->Left = column;
     }
 
+    void search(int k, std::vector<Data_object*> solution = {}) {
+        if (this->Header->Right == this->Header) {
+            std::cout << "Solution found: ";
+            for (Data_object* obj : solution) {
+                std::cout << "(" << obj->id1 << ", " << obj->id2 << ") ";
+            }
+            std::cout << std::endl;
+            return;
+        }
 
+        Column_object* column = min_size_column();
+        cover_column(column);
+
+        for (Data_object* i = column->Down; i != column; i = i->Down) {
+            solution.push_back(i);
+            for (Data_object* j = i->Right; j != i; j = j->Right) {
+                cover_column(static_cast<Column_object*>(j->Column_header));
+            }
+
+            search(k + 1, solution);
+
+            for (Data_object* j = i->Left; j != i; j = j->Left) {
+                uncover_column(static_cast<Column_object*>(j->Column_header));
+            }
+            solution.pop_back();
+        }
+    }
 
 
 };
