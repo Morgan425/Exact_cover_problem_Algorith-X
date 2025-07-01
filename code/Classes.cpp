@@ -49,7 +49,7 @@ class Diagram {
 
     Diagram() : Header(nullptr) {}
 
-    Diagram(std::vector<std::vector<bool>> matrix) {
+    Diagram(std::vector<std::vector<bool>> matrix, std::vector<std::string> column_names = {}) {
         
         Header = new Column_object("HEADER", 0, 0); // Create the header node
 
@@ -63,7 +63,15 @@ class Diagram {
 
         // Fill the first row with Column_object instances and links them
         for (int j = 0; j < matrix[0].size(); j++) {
-            Column_object* new_column_object = new Column_object(std::string("C") + std::to_string(j+1), 0, j + 1);
+            std::string column_name;
+            if (j < column_names.size()) {
+                // Use the provided column name if available
+                column_name = column_names[j];
+            } else {
+                // Default naming if no names are provided
+                column_name = "C" + std::to_string(j + 1);
+            }
+            Column_object* new_column_object = new Column_object(column_name, 0, j + 1);
             data_objects[0][j] = new_column_object;
             if (j == 0) {
                 Header->Right = new_column_object;
@@ -126,9 +134,26 @@ class Diagram {
                 }
             }
             current_node = current_node->Right;
-        }    
-
+        }
     }
+
+    ~Diagram() {
+        // Clean up the allocated memory
+        Data_object* current_node = Header->Right;
+        while (current_node != Header) {
+            Data_object* vertical_node = current_node->Down;
+            while (vertical_node != current_node) {
+                Data_object* node_to_delete = vertical_node;
+                vertical_node = vertical_node->Down;
+                delete node_to_delete;
+            }
+            Data_object* header_to_delete = current_node;
+            current_node = current_node->Right;
+            delete header_to_delete;
+        }
+        delete Header; // Delete the header node
+    }
+
 
     bool partial_print(){
         std::cout << "Vertical links:" << std::endl;
@@ -162,6 +187,55 @@ class Diagram {
 
         return true;
     }
+
+
+    Column_object* min_size_column(){
+        Column_object* min_column = static_cast<Column_object*>(this->Header->Right);
+        int min_size = min_column->Size;
+        Column_object* current_col = static_cast<Column_object*>(current_col->Right);
+        while (current_col != this->Header){
+            if (current_col->Size < min_size){
+                min_size = current_col->Size;
+                min_column = current_col;
+            }
+            current_col = static_cast<Column_object*>(current_col->Right);
+        }
+        return min_column;
+    }
+
+
+    void cover_column(Column_object* column) {
+        column->Left->Right = column->Right;
+        column->Right->Left = column->Left;
+        for (Data_object* i = column->Down; i != column; i = i->Down) {
+            for (Data_object* j = i->Right; j != i; j = j->Right) {
+                j->Up->Down = j->Down;
+                j->Down->Up = j->Up;
+                static_cast<Column_object*>(j->Column_header)->Size--;
+            }
+        }
+    }
+
+    void cover_chosen_column() {
+        Column_object* column = min_size_column();
+        cover_column(column);
+    }
+
+
+    void uncover_column(Column_object* column) {
+        for (Data_object* i = column->Up; i != column; i = i->Up) {
+            for (Data_object* j = i->Left; j != i; j = j->Left) {
+                static_cast<Column_object*>(j->Column_header)->Size++;
+                j->Up->Down = j;
+                j->Down->Up = j;
+            }
+        }
+        column->Left->Right = column;
+        column->Right->Left = column;
+    }
+
+
+
 
 };
 

@@ -5,7 +5,7 @@ int main() {
         {1, 0, 1},
         {0, 1, 0},
         {1, 0, 1}
-    });
+    }, {"Column"});
 
     std::cout << test_diagram.partial_print() << std::endl;
 
