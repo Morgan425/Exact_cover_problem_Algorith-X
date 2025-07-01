@@ -7,7 +7,7 @@ int main() {
         {1, 0, 1}
     });
 
-    std::cout << test_diagram.print() << std::endl;
+    std::cout << test_diagram.partial_print() << std::endl;
 
     return 0;
 }

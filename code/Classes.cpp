@@ -17,11 +17,7 @@ class Data_object {
     Data_object(int row, int col) : Left(nullptr), Right(nullptr), Up(nullptr), Down(nullptr), Column_header(nullptr), id1(row), id2(col) {}
 
     virtual void print(){
-        if (id1 || id2) {
-            std::cout << "Node IDs: " << id1 << ", " << id2 << std::endl;
-        } else {
-            std::cout << "HEADER NODE" << std::endl;
-        }
+        std::cout << "Node IDs: " << id1 << ", " << id2 << std::endl;
     }
 
 
@@ -34,14 +30,14 @@ class Column_object : public Data_object {
     std::string Name;
     int Size;
 
-    Column_object(std::string name, int size, int id) : Name(name), Size(size), Data_object(0, id) {
-        id1 = 0; // Column objects do not have row IDs
-        id2 = 0; // Column objects do not have column IDs
-
-    }
+    Column_object(std::string name, int size, int id) : Name(name), Size(size), Data_object(0, id) {}
 
     void print(){
-        std::cout << "Header Node ID: " << id2 << std::endl;
+        if (id2) {
+            std::cout << "Header Node ID: " << id2 << ", Name: " << Name  << ", Size:" << Size << std::endl;
+        } else {
+            std::cout << "HEADER NODE" << std::endl;
+        }
     }
 
 };
@@ -55,23 +51,20 @@ class Diagram {
 
     Diagram(std::vector<std::vector<bool>> matrix) {
         
-        Header = new Data_object(0, 0); // Create the header node
+        Header = new Column_object("HEADER", 0, 0); // Create the header node
 
         // Initialize the nodes matrix
         std::vector<std::vector<Data_object*>> data_objects(matrix.size() + 1, std::vector<Data_object*>(matrix[0].size()));
-        int id_base = 1;
-        while (id_base < matrix[0].size()) {
-            id_base *= 10;
-        }
         for (int i = 1; i <= matrix.size(); i++) {
             for (int j = 0; j < matrix[0].size(); j++) {
-                data_objects[i][j] = new Data_object(i+1, j+1); // Assign unique IDs to each Data_object
+                data_objects[i][j] = new Data_object(i, j + 1); // Assign unique IDs to each Data_object
             }
         }
 
         // Fill the first row with Column_object instances and links them
         for (int j = 0; j < matrix[0].size(); j++) {
-            Column_object* new_column_object = new Column_object(std::string("C") + std::to_string(j), 0, j + 1);
+            Column_object* new_column_object = new Column_object(std::string("C") + std::to_string(j+1), 0, j + 1);
+            data_objects[0][j] = new_column_object;
             if (j == 0) {
                 Header->Right = new_column_object;
                 new_column_object->Left = Header;
@@ -83,7 +76,6 @@ class Diagram {
                 new_column_object->Right = Header;
                 Header->Left = new_column_object;
             }
-            data_objects[0][j] = new_column_object;
         }
 
         // Vertically link nodes
@@ -118,7 +110,9 @@ class Diagram {
             Data_object* vertical_node = current_node->Down;
             while (vertical_node != current_node){
 
-                if (matrix[vertical_node->id1][vertical_node->id2]){
+                if (matrix[vertical_node->id1 - 1][vertical_node->id2 - 1]){
+                    Column_object* column_header = static_cast<Column_object*>(vertical_node->Column_header);
+                    column_header->Size++;
                     vertical_node = vertical_node->Down;
                 } else {
                     // Remove the node
@@ -131,13 +125,12 @@ class Diagram {
                     delete node_to_delete;
                 }
             }
-            std::cout << std::endl;
             current_node = current_node->Right;
         }    
 
     }
 
-    bool print(){
+    bool partial_print(){
         std::cout << "Vertical links:" << std::endl;
         Data_object* current_node = this->Header->Right;
         while (current_node != this->Header){
