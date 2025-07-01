@@ -17,7 +17,15 @@ class Data_object {
         id = rand() % 1000000; // Random ID for tracking purposes
     }
 
-    virtual ~Data_object() {} // Make Base polymorphic (enables RTTI)
+    virtual void print(){
+        if (id){
+            std::cout << "Node ID: " << id << std::endl;
+        } else {
+            std::cout << "HEADER NODE" << std::endl;
+        }
+    }
+
+
 
 };
 
@@ -28,6 +36,10 @@ class Column_object : public Data_object {
     int Size;
 
     Column_object(std::string name, int size) : Name(name), Size(size) {}
+
+    void print(){
+        std::cout << "Header Node ID: " << id << std::endl;
+    }
 
 };
 
@@ -93,38 +105,35 @@ class Diagram {
         }
     }
 
-    bool Circularity_test(){
+    bool print(){
+        std::cout << "Vertical links:" << std::endl;
         Data_object* current_node = this->Header->Right;
         int counter = 0;
-        while (current_node != this->Header && counter < 20){
+        while (current_node != this->Header){
             Data_object* vertical_node = current_node->Down;
+            vertical_node->print();
             while (vertical_node != current_node){
-                if (dynamic_cast<Column_object*>(vertical_node)){
-                    std::cout << "Checking Header node with ID: " << vertical_node->id << std::endl;
-                } else {
-                    std::cout << "Checking node with ID: " << vertical_node->id << std::endl;
-                }
-                std::cout << vertical_node->Down->id << "   " << vertical_node->Up->id << std::endl;
-                std::cout << counter << std::endl;
                 vertical_node = vertical_node->Down;
+                vertical_node->print();
             }
-            counter++;
+            std::cout << std::endl;
+            current_node = current_node->Right;
         }
 
-        counter = 0;
+        Data_object* base_node = this->Header->Right;
+        std::cout << std::endl << std::endl << "Horizontal links:" << std::endl;
+        current_node = base_node->Down;
+        
 
-        while (current_node != this->Header && counter < 20){
+        while (current_node != base_node){
             Data_object* horizontal_node = current_node->Right;
+            horizontal_node->print();
             while (horizontal_node != current_node){
-                if (dynamic_cast<Column_object*>(horizontal_node)){
-                    std::cout << "Checking Header node with ID: " << horizontal_node->id << std::endl;
-                } else {
-                    std::cout << "Checking node with ID: " << horizontal_node->id << std::endl;
-                }
-                std::cout << counter << std::endl;
                 horizontal_node = horizontal_node->Right;
+                horizontal_node->print();
             }
-            counter++;
+            std::cout << std::endl;
+            current_node = current_node->Down;
         }
 
         return true;
