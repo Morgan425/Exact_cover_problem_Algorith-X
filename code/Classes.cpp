@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <random>
 
 
 class Data_object {
@@ -10,8 +11,13 @@ class Data_object {
     Data_object* Up;
     Data_object* Down;
     Data_object* Column_header;
+    int id;
 
-    Data_object() : Left(nullptr), Right(nullptr), Up(nullptr), Down(nullptr), Column_header(nullptr) {}
+    Data_object() : Left(nullptr), Right(nullptr), Up(nullptr), Down(nullptr), Column_header(nullptr) {
+        id = rand() % 1000000; // Random ID for tracking purposes
+    }
+
+    virtual ~Data_object() {} // Make Base polymorphic (enables RTTI)
 
 };
 
@@ -35,6 +41,7 @@ class Diagram {
     Diagram(std::vector<std::vector<bool>> matrix) {
         
         Header = new Data_object();
+        Header->id = 0;
 
         // Initialize the nodes matrix
         std::vector<std::vector<Data_object*>> data_objects(matrix.size() + 1, std::vector<Data_object*>(matrix[0].size()));
@@ -88,18 +95,36 @@ class Diagram {
 
     bool Circularity_test(){
         Data_object* current_node = this->Header->Right;
-        while (current_node != this->Header){
+        int counter = 0;
+        while (current_node != this->Header && counter < 20){
             Data_object* vertical_node = current_node->Down;
             while (vertical_node != current_node){
+                if (dynamic_cast<Column_object*>(vertical_node)){
+                    std::cout << "Checking Header node with ID: " << vertical_node->id << std::endl;
+                } else {
+                    std::cout << "Checking node with ID: " << vertical_node->id << std::endl;
+                }
+                std::cout << vertical_node->Down->id << "   " << vertical_node->Up->id << std::endl;
+                std::cout << counter << std::endl;
                 vertical_node = vertical_node->Down;
             }
+            counter++;
         }
 
-        while (current_node != this->Header){
+        counter = 0;
+
+        while (current_node != this->Header && counter < 20){
             Data_object* horizontal_node = current_node->Right;
             while (horizontal_node != current_node){
+                if (dynamic_cast<Column_object*>(horizontal_node)){
+                    std::cout << "Checking Header node with ID: " << horizontal_node->id << std::endl;
+                } else {
+                    std::cout << "Checking node with ID: " << horizontal_node->id << std::endl;
+                }
+                std::cout << counter << std::endl;
                 horizontal_node = horizontal_node->Right;
             }
+            counter++;
         }
 
         return true;
