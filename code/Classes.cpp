@@ -213,7 +213,6 @@ class Diagram {
             }
             current_col = static_cast<Column_object*>(current_col->Right);
         }
-        std::cout << "Minimum size column: " << min_column->Name << " with size: " << min_column->Size << std::endl;
         return min_column;
     }
 
@@ -269,10 +268,6 @@ class Diagram {
 
 
     void search(int k) {
-        std::cout << "Searching at depth: " << k << ",   " << "temp solution is ";
-        this->print_solution();
-        // this->matrix_print();
-        // std::cout << std::endl;
         
         if (this->Header->Right == this->Header) {
             std::cout << "Solution found: " << std::endl;
@@ -286,24 +281,18 @@ class Diagram {
         for (Data_object* i = column->Down; i != column; i = i->Down) {
             solution.push_back(i);
             for (Data_object* j = i->Right; j != i; j = j->Right) {
-                // std::cout << "Covering column: " << static_cast<Column_object*>(j->Column_header)->Name << std::endl;
                 cover_column(static_cast<Column_object*>(j->Column_header));
             }
 
             this->search(k + 1);
 
-            // this->matrix_print();
-            // std::cout << std::endl;
-
             for (Data_object* j = i->Left; j != i; j = j->Left) {
-                // std::cout << "Uncovering column: " << static_cast<Column_object*>(j->Column_header)->Name << std::endl;
                 uncover_column(static_cast<Column_object*>(j->Column_header));
             }
             solution.pop_back();
         }
 
         uncover_column(column);
-        // this->matrix_print();
     }
 
 
