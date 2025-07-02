@@ -160,6 +160,7 @@ class Diagram {
 
     void matrix_print() {
         for (Data_object* current_node = this->Header->Right; current_node != this->Header; current_node = current_node->Right) {
+            std::cout << static_cast<Column_object*>(current_node)->Name << ": ";
             for (Data_object* vertical_node = current_node->Down; vertical_node != current_node; vertical_node = vertical_node->Down) {
                 std::cout << "(" << vertical_node->id1 << ", " << vertical_node->id2 << ") ";
             }
@@ -217,7 +218,7 @@ class Diagram {
     }
 
 
-    void cover_column(Column_object* column) {
+    Column_object* cover_column(Column_object* column) {
         column->Left->Right = column->Right;
         column->Right->Left = column->Left;
         for (Data_object* i = column->Down; i != column; i = i->Down) {
@@ -227,6 +228,7 @@ class Diagram {
                 static_cast<Column_object*>(j->Column_header)->Size--;
             }
         }
+        return column;
     }
 
 
@@ -245,6 +247,10 @@ class Diagram {
     void print_solution() {
         for (Data_object* obj : solution) {
             std::cout << static_cast<Column_object*>(obj->Column_header)->Name << " ";
+            for (Data_object* j = obj->Right; j != obj; j = j->Right) {
+                std::cout << static_cast<Column_object*>(j->Column_header)->Name << " ";
+            }
+            std::cout << std::endl;
         }
         std::cout << std::endl;
     }
@@ -260,13 +266,16 @@ class Diagram {
         std::cout << std::endl;
     }
 
+
+
     void search(int k) {
         std::cout << "Searching at depth: " << k << ",   " << "temp solution is ";
         this->print_solution();
-        this->matrix_print();
+        // this->matrix_print();
+        // std::cout << std::endl;
         
         if (this->Header->Right == this->Header) {
-            std::cout << "Solution found: ";
+            std::cout << "Solution found: " << std::endl;
             print_solution();
             return;
         }
@@ -277,16 +286,24 @@ class Diagram {
         for (Data_object* i = column->Down; i != column; i = i->Down) {
             solution.push_back(i);
             for (Data_object* j = i->Right; j != i; j = j->Right) {
+                // std::cout << "Covering column: " << static_cast<Column_object*>(j->Column_header)->Name << std::endl;
                 cover_column(static_cast<Column_object*>(j->Column_header));
             }
 
             this->search(k + 1);
 
+            // this->matrix_print();
+            // std::cout << std::endl;
+
             for (Data_object* j = i->Left; j != i; j = j->Left) {
+                // std::cout << "Uncovering column: " << static_cast<Column_object*>(j->Column_header)->Name << std::endl;
                 uncover_column(static_cast<Column_object*>(j->Column_header));
             }
             solution.pop_back();
         }
+
+        uncover_column(column);
+        // this->matrix_print();
     }
 
 
