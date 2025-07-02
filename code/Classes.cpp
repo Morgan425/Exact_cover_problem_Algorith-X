@@ -46,6 +46,7 @@ class Column_object : public Data_object {
 class Diagram {
     public:
     Data_object* Header;
+    std::vector<Data_object*> solution;
 
     Diagram() : Header(nullptr) {}
 
@@ -157,8 +158,16 @@ class Diagram {
         delete Header; // Delete the header node
     }
 
+    void matrix_print() {
+        for (Data_object* current_node = this->Header->Right; current_node != this->Header; current_node = current_node->Right) {
+            for (Data_object* vertical_node = current_node->Down; vertical_node != current_node; vertical_node = vertical_node->Down) {
+                std::cout << "(" << vertical_node->id1 << ", " << vertical_node->id2 << ") ";
+            }
+            std::cout << std::endl;
+        }
+    }
 
-    bool partial_print(){
+    bool partial_link_print(){
         std::cout << "Vertical links:" << std::endl;
         Data_object* current_node = this->Header->Right;
         while (current_node != this->Header){
@@ -195,7 +204,7 @@ class Diagram {
     Column_object* min_size_column(){
         Column_object* min_column = static_cast<Column_object*>(this->Header->Right);
         int min_size = min_column->Size;
-        Column_object* current_col = static_cast<Column_object*>(current_col->Right);
+        Column_object* current_col = static_cast<Column_object*>(min_column->Right);
         while (current_col != this->Header){
             if (current_col->Size < min_size){
                 min_size = current_col->Size;
@@ -203,6 +212,7 @@ class Diagram {
             }
             current_col = static_cast<Column_object*>(current_col->Right);
         }
+        std::cout << "Minimum size column: " << min_column->Name << " with size: " << min_column->Size << std::endl;
         return min_column;
     }
 
@@ -232,13 +242,32 @@ class Diagram {
         column->Right->Left = column;
     }
 
-    void search(int k, std::vector<Data_object*> solution = {}) {
+    void print_solution() {
+        for (Data_object* obj : solution) {
+            std::cout << static_cast<Column_object*>(obj->Column_header)->Name << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    void print_sizes() {
+        Data_object* current_node = this->Header->Right;
+        std::cout << "Sizes:    ";
+        while (current_node != this->Header) {
+            Column_object* column = static_cast<Column_object*>(current_node);
+            std::cout <<  column->Name << ": " << column->Size << ", ";
+            current_node = current_node->Right;
+        }
+        std::cout << std::endl;
+    }
+
+    void search(int k) {
+        std::cout << "Searching at depth: " << k << ",   " << "temp solution is ";
+        this->print_solution();
+        this->matrix_print();
+        
         if (this->Header->Right == this->Header) {
             std::cout << "Solution found: ";
-            for (Data_object* obj : solution) {
-                std::cout << "(" << obj->id1 << ", " << obj->id2 << ") ";
-            }
-            std::cout << std::endl;
+            print_solution();
             return;
         }
 
@@ -251,7 +280,7 @@ class Diagram {
                 cover_column(static_cast<Column_object*>(j->Column_header));
             }
 
-            search(k + 1, solution);
+            this->search(k + 1);
 
             for (Data_object* j = i->Left; j != i; j = j->Left) {
                 uncover_column(static_cast<Column_object*>(j->Column_header));
