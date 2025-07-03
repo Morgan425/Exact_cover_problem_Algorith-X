@@ -6,4 +6,4 @@ The **code** directory is comprised of **Classes.cpp** and **Algorithm X**. The 
 
 The **data** directory contains all the problems and solutions used for benchmarking
 
-Donald Knuth's papers used to make this are present in the **resources** direactory.
+Donald Knuth's papers used to make this are present in the **resources** directory.
