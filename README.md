@@ -7,3 +7,7 @@ The **code** directory is comprised of **Classes.cpp** and **Algorithm X**. The 
 The **data** directory contains all the problems and solutions used for benchmarking
 
 Donald Knuth's papers used to make this are present in the **resources** directory.
+
+Libraries used: all base cpp libraries
+
+Working commit: 3507f8f
