@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <random>
+#include <algorithm>
 
 
 class Data_object {
@@ -47,10 +48,11 @@ class Diagram {
     public:
     Data_object* Header;
     std::vector<Data_object*> solution;
+    std::vector<std::vector<int>> Solutions;
 
     Diagram() : Header(nullptr) {}
 
-    Diagram(std::vector<std::vector<bool>> matrix, std::vector<std::string> column_names = {}) {
+    Diagram(std::vector<std::vector<int>> matrix, std::vector<std::string> column_names = {}) {
         
         Header = new Column_object("HEADER", 0, 0); // Create the header node
 
@@ -63,7 +65,7 @@ class Diagram {
         }
 
         // Fill the first row with Column_object instances and links them
-        if (column_names.size() < matrix[0].size()) {
+        if (column_names.size() < matrix[0].size() && !column_names.empty()) {
             std::cerr << "Warning: Not enough column names provided. Default names will be used for missing columns." << std::endl << std::endl;
         }
         for (int j = 0; j < matrix[0].size(); j++) {
@@ -246,13 +248,17 @@ class Diagram {
     void print_solution() {
         for (Data_object* obj : solution) {
             std::cout << static_cast<Column_object*>(obj->Column_header)->Name << " ";
+            // std::cout << "(" << obj->id1 << ", " << obj->id2 << "); ";
             for (Data_object* j = obj->Right; j != obj; j = j->Right) {
                 std::cout << static_cast<Column_object*>(j->Column_header)->Name << " ";
+                // std::cout << "(" << j->id1 << ", " << j->id2 << "); ";
             }
             std::cout << std::endl;
         }
         std::cout << std::endl;
     }
+
+
 
     void print_sizes() {
         Data_object* current_node = this->Header->Right;
@@ -270,8 +276,13 @@ class Diagram {
     void search(int k) {
         
         if (this->Header->Right == this->Header) {
-            std::cout << "Solution found: " << std::endl;
-            print_solution();
+            // std::cout << "Solution found: " << std::endl;
+            std::vector<int> solution_ids;
+            for (Data_object* obj : solution) {
+                solution_ids.push_back(obj->id1 - 1); // Store the row index (id1 - 1)
+            }
+            Solutions.push_back(solution_ids);
+            // print_solution();
             return;
         }
 
