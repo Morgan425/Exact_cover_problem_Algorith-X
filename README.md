@@ -2,12 +2,12 @@ The point of this project is to so make a solver for the **exact cover problem**
 
 This project was vastly based on the work of **Donald Knuth** as the algorithm used is his **"Algorithm X"**.
 
-The **code** directory is comprised of **Classes.cpp** and **Algorithm X**. The first file allows to create all the classes needed, primarly Diagram. The latter is comprised of the main() function, which goal is to benchmark on the given data an this interpretation of Algorithm X.
+The **code** directory is comprised of **Classes.cpp** and **Algorithm X.cpp**. The first file allows to create all the classes needed, primarly Diagram. The latter is comprised of the main() function, which goal is to benchmark on the given data an this interpretation of Algorithm X.
 
 The **data** directory contains all the problems and solutions used for benchmarking
 
 Donald Knuth's papers used to make this are present in the **resources** directory.
 
-Libraries used: all base cpp libraries
 
+Libraries used: base cpp libraries
 Working commit: 3507f8f
